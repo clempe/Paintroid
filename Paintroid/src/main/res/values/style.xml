@@ -21,7 +21,7 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="CustomPaintroidDialog" parent="@android:style/Theme.Dialog">
+    <style name="CustomPaintroidDialog" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowTitleStyle">@style/DialogWindowTitle</item>
         <item name="android:linksClickable">true</item>
         <item name="android:backgroundDimEnabled">true</item>
