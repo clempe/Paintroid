@@ -162,7 +162,7 @@ public class TopBar extends Observable implements OnTouchListener, OnUpdateTopBa
 		}
 
 		mToolNameToast = Toast.makeText(mainActivity, mainActivity
-						.getString(mCurrentTool.getToolType().getNameResource()),
+				.getString(mCurrentTool.getToolType().getNameResource()),
 				Toast.LENGTH_SHORT);
 		mToolNameToast.setGravity(Gravity.TOP | Gravity.RIGHT, 0,
 				SWITCH_TOOL_TOAST_Y_OFFSET);
