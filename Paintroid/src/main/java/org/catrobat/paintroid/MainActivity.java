@@ -59,39 +59,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
-
-import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
-import org.catrobat.paintroid.command.implementation.LayerCommand;
-import org.catrobat.paintroid.dialog.BrushPickerDialog;
-import org.catrobat.paintroid.dialog.CustomAlertDialogBuilder;
-import org.catrobat.paintroid.dialog.DialogAbout;
-import org.catrobat.paintroid.dialog.DialogTermsOfUseAndService;
-import org.catrobat.paintroid.dialog.FillToolDialog;
-import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
-import org.catrobat.paintroid.dialog.InfoDialog;
-import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
-import org.catrobat.paintroid.dialog.LayersDialog;
-import org.catrobat.paintroid.dialog.TextToolDialog;
-import org.catrobat.paintroid.dialog.ToolsDialog;
-import org.catrobat.paintroid.dialog.colorpicker.ColorPickerDialog;
-import org.catrobat.paintroid.listener.DrawingSurfaceListener;
-import org.catrobat.paintroid.tools.Tool;
-import org.catrobat.paintroid.tools.ToolFactory;
-import org.catrobat.paintroid.tools.ToolType;
-import org.catrobat.paintroid.tools.implementation.ImportTool;
-import org.catrobat.paintroid.ui.BottomBar;
-import org.catrobat.paintroid.ui.DrawingSurface;
-import org.catrobat.paintroid.ui.Perspective;
-import org.catrobat.paintroid.ui.TopBar;
-
-import java.io.File;
-
-public class MainActivity extends OptionsMenuActivity {
+public class MainActivity extends AppCompatActivity {
 
 	public static final String EXTRA_INSTANCE_FROM_CATROBAT = "EXTRA_INSTANCE_FROM_CATROBAT";
 	public static final String EXTRA_ACTION_BAR_HEIGHT = "EXTRA_ACTION_BAR_HEIGHT";
@@ -298,12 +273,13 @@ public class MainActivity extends OptionsMenuActivity {
 		super.onCreateOptionsMenu(menu);
 		mMenu = menu;
 		PaintroidApplication.menu = mMenu;
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		if (PaintroidApplication.openedFromCatroid) {
 			inflater.inflate(R.menu.main_menu_opened_from_catroid, menu);
 		} else {
 			inflater.inflate(R.menu.main_menu, menu);
 		}
+
 
 		return true;
 	}
@@ -312,34 +288,34 @@ public class MainActivity extends OptionsMenuActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		switch (item.getItemId()) {
-		case R.id.menu_item_back_to_catroid:
-			showSecurityQuestionBeforeExit();
-			return true;
-		case R.id.menu_item_terms_of_use_and_service:
-			DialogTermsOfUseAndService termsOfUseAndService = new DialogTermsOfUseAndService();
-			termsOfUseAndService.show(getSupportFragmentManager(),
-					"termsofuseandservicedialogfragment");
-			return true;
-		case R.id.menu_item_about:
-			DialogAbout about = new DialogAbout();
-			about.show(getSupportFragmentManager(), "aboutdialogfragment");
-			return true;
-		case R.id.menu_item_hide_menu:
-			setFullScreen(mToolbarIsVisible);
-			return true;
-		case android.R.id.home:
-			if (PaintroidApplication.openedFromCatroid) {
+			case R.id.menu_item_back_to_catroid:
 				showSecurityQuestionBeforeExit();
-			}
-			return true;
-			/* EXCLUDE PREFERENCES FOR RELEASE */
+				return true;
+			case R.id.menu_item_terms_of_use_and_service:
+				DialogTermsOfUseAndService termsOfUseAndService = new DialogTermsOfUseAndService();
+				termsOfUseAndService.show(getSupportFragmentManager(),
+						"termsofuseandservicedialogfragment");
+				return true;
+			case R.id.menu_item_about:
+				DialogAbout about = new DialogAbout();
+				about.show(getSupportFragmentManager(), "aboutdialogfragment");
+				return true;
+			case R.id.menu_item_hide_menu:
+				setFullScreen(mToolbarIsVisible);
+				return true;
+			case android.R.id.home:
+				if (PaintroidApplication.openedFromCatroid) {
+					showSecurityQuestionBeforeExit();
+				}
+				return true;
+			//* EXCLUDE PREFERENCES FOR RELEASE *//*
 			// case R.id.menu_item_preferences:
 			// Intent intent = new Intent(this, SettingsActivity.class);
 			// intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 			// startActivity(intent);
 			// return false;
-		default:
-			return super.onOptionsItemSelected(item);
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -363,6 +339,7 @@ public class MainActivity extends OptionsMenuActivity {
 			switchTool(ToolType.BRUSH);
 		}
 	}
+
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {

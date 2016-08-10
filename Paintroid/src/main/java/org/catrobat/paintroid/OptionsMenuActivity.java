@@ -19,14 +19,6 @@
 
 package org.catrobat.paintroid;
 
-import java.io.File;
-
-import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
-import org.catrobat.paintroid.dialog.InfoDialog;
-import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
-import org.catrobat.paintroid.tools.Tool.StateChange;
-import org.catrobat.paintroid.tools.implementation.ImportTool;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -41,10 +33,17 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
+import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
+
+import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
+import org.catrobat.paintroid.dialog.InfoDialog;
+import org.catrobat.paintroid.dialog.InfoDialog.DialogType;
+import org.catrobat.paintroid.tools.Tool.StateChange;
+import org.catrobat.paintroid.tools.implementation.ImportTool;
+
+import java.io.File;
 
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
