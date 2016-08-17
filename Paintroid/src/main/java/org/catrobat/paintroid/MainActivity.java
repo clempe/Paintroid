@@ -106,8 +106,6 @@ public class MainActivity extends OptionsMenuActivity {
          */
 
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.main);
         // setDefaultPreferences();
         initActionBar();
@@ -128,8 +126,6 @@ public class MainActivity extends OptionsMenuActivity {
                 PaintroidApplication.catroidPicturePath = catroidPicturePath;
                 PaintroidApplication.scaleImage = false;
             }
-
-            //TODO NullPointerException?
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         } else {
@@ -137,7 +133,8 @@ public class MainActivity extends OptionsMenuActivity {
         }
 
         PaintroidApplication.drawingSurface = (DrawingSurface) findViewById(R.id.drawingSurfaceView);
-        PaintroidApplication.perspective = new Perspective(PaintroidApplication.drawingSurface.getHolder());
+        PaintroidApplication.perspective = new Perspective(
+                ((SurfaceView) PaintroidApplication.drawingSurface).getHolder());
         mDrawingSurfaceListener = new DrawingSurfaceListener();
         mTopBar = new TopBar(this, PaintroidApplication.openedFromCatroid);
         mBottomBar = new BottomBar(this);
@@ -205,7 +202,6 @@ public class MainActivity extends OptionsMenuActivity {
 
     private void initActionBar() {
 
-        //TODO NullPointerException
         getSupportActionBar().setCustomView(R.layout.top_bar);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -214,7 +210,8 @@ public class MainActivity extends OptionsMenuActivity {
                     Config.ARGB_8888);
             bitmapActionBarBackground.eraseColor(getResources().getColor(
                     R.color.custom_background_color));
-            Drawable drawable = new BitmapDrawable(getResources(), bitmapActionBarBackground);
+            Drawable drawable = new BitmapDrawable(getResources(),
+                    bitmapActionBarBackground);
             getSupportActionBar().setBackgroundDrawable(drawable);
             getSupportActionBar().setSplitBackgroundDrawable(drawable);
         }
@@ -247,7 +244,7 @@ public class MainActivity extends OptionsMenuActivity {
         super.onDestroy();
     }
 
-   /* @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         mMenu = menu;
@@ -261,7 +258,7 @@ public class MainActivity extends OptionsMenuActivity {
 
 
         return true;
-    }*/
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
