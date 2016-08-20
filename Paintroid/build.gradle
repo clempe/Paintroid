@@ -11,8 +11,8 @@ android {
         targetSdkVersion 22
         testApplicationId "org.catrobat.paintroid.test"
         testInstrumentationRunner "pl.polidea.instrumentation.PolideaInstrumentationTestRunner"
-		versionCode 17
-		versionName "1.1.15"
+        versionCode 17
+        versionName "1.1.15"
     }
 
     sourceSets {
