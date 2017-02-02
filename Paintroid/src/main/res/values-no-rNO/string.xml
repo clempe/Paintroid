@@ -41,8 +41,8 @@
   <string name="button_text">Text</string>
   <string name="cancel">Cancel</string>
   <string name="ok" tools:ignore="Typos">\@android:string/ok</string>
-  <string name="yes">Yes</string>
-  <string name="no">No</string>
+  <string name="yes">Ja</string>
+  <string name="no">Nei</string>
   <string name="done">Done</string>
   <string name="terms_of_use_and_service_title">Terms of Use and Service</string>
   <string name="terms_of_use_and_service_content">In order to be allowed to use Pocket Paint and other executables offered by the Catrobat project, you must agree to our Terms of Use and Service and strictly follow them when you use Pocket Code and our other executables. Please see the link below for their precise formulation.\n\n</string>
@@ -98,9 +98,9 @@
   <string name="menu_item_tools">Tools menu</string>
   <string name="menu_hide_menu">Fullscreen</string>
   <string name="menu_new_image_from_camera">New image from camera</string>
-  <string name="menu_terms_of_use_and_service">&amp;#x641C;&amp;#x7D22;</string>
+  <string name="menu_terms_of_use_and_service">Terms of Use</string>
   <string name="more">More</string>
-  <string name="menu_about">&amp;#x5355;</string>
+  <string name="menu_about">About</string>
   <string name="menu_back">@string/closing_catroid_security_question_title</string>
   <string name="menu_export">Export</string>
   <string name="saved">Image saved</string>

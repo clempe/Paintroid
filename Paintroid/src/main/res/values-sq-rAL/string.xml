@@ -39,7 +39,7 @@
   <string name="button_rotate">Rotate</string>
   <string name="button_line">Line</string>
   <string name="button_text">Text</string>
-  <string name="cancel">Cancel</string>
+  <string name="cancel">Anulo</string>
   <string name="ok" tools:ignore="Typos">\@android:string/ok</string>
   <string name="yes">Yes</string>
   <string name="no">No</string>
@@ -98,9 +98,9 @@
   <string name="menu_item_tools">Tools menu</string>
   <string name="menu_hide_menu">Fullscreen</string>
   <string name="menu_new_image_from_camera">New image from camera</string>
-  <string name="menu_terms_of_use_and_service">&amp;#x641C;&amp;#x7D22;</string>
+  <string name="menu_terms_of_use_and_service">Terms of Use</string>
   <string name="more">More</string>
-  <string name="menu_about">&amp;#x5355;</string>
+  <string name="menu_about">About</string>
   <string name="menu_back">@string/closing_catroid_security_question_title</string>
   <string name="menu_export">Export</string>
   <string name="saved">Image saved</string>
@@ -133,13 +133,13 @@
   <string name="layer_merge">Merge</string>
   <string name="layer_visible">Visible</string>
   <string name="layer_lock">Lock</string>
-  <string name="layer_rename">Rename</string>
+  <string name="layer_rename">Riemërto</string>
   <string name="layer_copy">Copy</string>
   <string name="layer_ok">OK</string>
-  <string name="layer_cancel">Cancel</string>
+  <string name="layer_cancel">Anulo</string>
   <string name="layer_rename_title">Enter new layer name</string>
-  <string name="layer_move_up">Move up</string>
-  <string name="layer_move_down">Move down</string>
+  <string name="layer_move_up">Lëviz lart</string>
+  <string name="layer_move_down">Lëviz poshte</string>
   <string name="layer_move_to_top">Move to top</string>
   <string name="layer_move_to_bottom">Move to bottom</string>
   <string name="layer_merge_info">Tap the layer to merge with</string>
