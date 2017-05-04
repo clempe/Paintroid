@@ -2,12 +2,9 @@ package org.catrobat.paintroid.test.junit;
 
 import android.support.test.runner.AndroidJUnit4;
 
-import junit.framework.Assert;
-
 import org.catrobat.paintroid.datastructures.LimitedSizeQueue;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import java.util.LinkedList;
@@ -48,7 +45,7 @@ public class LimitedSizeQueueTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateWithInvalidMaximum() {
-        LimitedSizeQueue<Object> objectLimitedSizeQueue = new LimitedSizeQueue<>(0);
+        new LimitedSizeQueue<>(0);
     }
 
     @Test(expected = NoSuchElementException.class)
