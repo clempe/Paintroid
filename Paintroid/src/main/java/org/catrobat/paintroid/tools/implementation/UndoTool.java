@@ -20,109 +20,120 @@
 package org.catrobat.paintroid.tools.implementation;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.drawable.PaintDrawable;
+import android.util.Log;
+import android.view.SurfaceHolder;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.command.UndoRedoManager;
+import org.catrobat.paintroid.command.implementation.BitmapCommand;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.ResizeCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
-import org.catrobat.paintroid.eventlistener.OnUpdateTopBarListener;
 import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
 import org.catrobat.paintroid.tools.ToolType;
-import org.catrobat.paintroid.ui.Perspective;
 
 import java.util.LinkedList;
 
 
 public class UndoTool extends BaseTool {
 
-	private Tool mPreviousTool;
-	private Layer mLayer;
-	private LayerBitmapCommand mLayerBitmapCommand;
-	private LinkedList<Command> mCommandList;
-	private boolean mReadyForUndo = false;
+    private Tool mPreviousTool;
+    private Layer mLayer;
+    private LayerBitmapCommand mLayerBitmapCommand;
+    private LinkedList<Command> mCommandList;
+    private boolean mReadyForUndo = false;
 
-	public UndoTool(Context context, ToolType toolType) {
-		super(context, toolType);
-		mPreviousTool = PaintroidApplication.currentTool;
-		mLayer = LayerListener.getInstance().getCurrentLayer();
-		LayerCommand layerCommand = new LayerCommand(mLayer);
-		mLayerBitmapCommand = PaintroidApplication.commandManager
-				.getLayerBitmapCommand(layerCommand);
-		showProgressDialog();
-		mReadyForUndo = true;
-	}
-
-
-
-	@Override
-	public boolean handleDown(PointF coordinate) {
-		return false;
-	}
-
-	@Override
-	public boolean handleMove(PointF coordinate) {
-		return false;
-	}
-
-	@Override
-	public boolean handleUp(PointF coordinate) {
-		return  true;
-	}
-
-	@Override
-	public void resetInternalState() {
-	}
-
-	@Override
-	public void draw(Canvas canvas) {
-		if(mReadyForUndo){
-			PaintroidApplication.currentTool = mPreviousTool;
-			mReadyForUndo = false;
-
-			float scale = PaintroidApplication.perspective.getScale();
-			float surfaceTranslationX = PaintroidApplication.perspective.getSurfaceTranslationX();
-			float surfaceTranslationY = PaintroidApplication.perspective.getSurfaceTranslationY();
-
-			mLayerBitmapCommand.clearLayerBitmap();
-			mLayerBitmapCommand.addCommandToUndoList();
-			UndoRedoManager.getInstance().update();
-
-			for (Command command : mLayerBitmapCommand.getLayerCommands()) {
-				if(command.getClass().equals(ResizeCommand.class)) // doesnt work correct -> remove for release
-					continue;
-				command.run(PaintroidApplication.drawingSurface.getCanvas(), mLayer.getImage());
-			}
-			IndeterminateProgressDialog.getInstance().dismiss();
-			setPerspective(scale, surfaceTranslationX, surfaceTranslationY);
-		}
-
-	}
-
-	@Override
-	public void setupToolOptions() {
-		mPreviousTool.setupToolOptions();
-		ToolType toolType = mPreviousTool.getToolType();
-		ToolType.UNDO.setNameResource(toolType.getNameResource());
-	}
+    public UndoTool(Context context, ToolType toolType) {
+        super(context, toolType);
+        mPreviousTool = PaintroidApplication.currentTool;
+        mLayer = LayerListener.getInstance().getCurrentLayer();
+        LayerCommand layerCommand = new LayerCommand(mLayer);
+        mLayerBitmapCommand = PaintroidApplication.commandManager
+                .getLayerBitmapCommand(layerCommand);
+        showProgressDialog();
+        mReadyForUndo = true;
+    }
 
 
-	private void showProgressDialog() {
-		if(mLayerBitmapCommand.getLayerCommands().size() != 0)
-			IndeterminateProgressDialog.getInstance().show();
-	}
+    @Override
+    public boolean handleDown(PointF coordinate) {
+        return false;
+    }
 
-	private void setPerspective(float scale, float translationX, float translationY) {
-		PaintroidApplication.perspective.setScale(scale);
-		PaintroidApplication.perspective.setSurfaceTranslationX(translationX);
-		PaintroidApplication.perspective.setSurfaceTranslationY(translationY);
-	}
+    @Override
+    public boolean handleMove(PointF coordinate) {
+        return false;
+    }
+
+    @Override
+    public boolean handleUp(PointF coordinate) {
+        return true;
+    }
+
+    @Override
+    public void resetInternalState() {
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        if (mReadyForUndo) {
+            PaintroidApplication.currentTool = mPreviousTool;
+            mReadyForUndo = false;
+
+            float scale = PaintroidApplication.perspective.getScale();
+            float surfaceTranslationX = PaintroidApplication.perspective.getSurfaceTranslationX();
+            float surfaceTranslationY = PaintroidApplication.perspective.getSurfaceTranslationY();
+
+            Log.d("UndoTool", "draw");
+
+            mLayerBitmapCommand.clearLayerBitmap();
+            mLayerBitmapCommand.addCommandToUndoList();
+            UndoRedoManager.getInstance().update();
+
+            Bitmap bitmapFromHistoryStack = mLayer.getBitmapFromHistoryStack();
+
+            if (bitmapFromHistoryStack != null) {
+                PaintroidApplication.drawingSurface.setBitmap(bitmapFromHistoryStack);
+            } else {
+
+                for (Command command : mLayerBitmapCommand.getLayerCommands()) {
+                    if (command.getClass().equals(ResizeCommand.class)) // doesnt work correct -> remove for release
+                        continue;
+                    command.run(PaintroidApplication.drawingSurface.getCanvas(), mLayer.getImage());
+                }
+            }
+            IndeterminateProgressDialog.getInstance().dismiss();
+            setPerspective(scale, surfaceTranslationX, surfaceTranslationY);
+        }
+
+    }
+
+    @Override
+    public void setupToolOptions() {
+        mPreviousTool.setupToolOptions();
+        ToolType toolType = mPreviousTool.getToolType();
+        ToolType.UNDO.setNameResource(toolType.getNameResource());
+    }
+
+
+    private void showProgressDialog() {
+        if (mLayerBitmapCommand.getLayerCommands().size() != 0)
+            IndeterminateProgressDialog.getInstance().show();
+    }
+
+    private void setPerspective(float scale, float translationX, float translationY) {
+        PaintroidApplication.perspective.setScale(scale);
+        PaintroidApplication.perspective.setSurfaceTranslationX(translationX);
+        PaintroidApplication.perspective.setSurfaceTranslationY(translationY);
+    }
 
 }

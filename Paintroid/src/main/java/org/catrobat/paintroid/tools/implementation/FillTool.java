@@ -118,6 +118,7 @@ public class FillTool extends BaseTool {
 		if(mReadyForDrawing) {
 			mReadyForDrawing = false;
 			Layer layer = LayerListener.getInstance().getCurrentLayer();
+			layer.saveLayerBitmap();
 			mCommand.run(PaintroidApplication.drawingSurface.getCanvas(), layer.getImage());
 			LayerCommand layerCommand = new LayerCommand(LayerListener.getInstance().getCurrentLayer());
 			PaintroidApplication.commandManager.addCommandToList(layerCommand,mCommand);

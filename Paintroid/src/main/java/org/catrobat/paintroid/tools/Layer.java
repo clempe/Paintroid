@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
+import org.catrobat.paintroid.datastructures.LimitedSizeQueue;
 
 public class Layer {
 	private static final String LAYER_PREFIX = PaintroidApplication.applicationContext.
@@ -15,6 +16,7 @@ public class Layer {
 	private boolean mIsLocked;
 	private boolean mIsVisible;
 	private int mOpacity;
+	private LimitedSizeQueue<Bitmap> bitmapHistory = new LimitedSizeQueue<>(5);
 
 	public Layer(int layer_id, Bitmap image) {
 		mLayerID = layer_id;
@@ -89,4 +91,17 @@ public class Layer {
 		return this;
 	}
 
+	public void saveLayerBitmap() {
+		Bitmap copy = mBitmap.copy(mBitmap.getConfig(), true);
+		bitmapHistory.add(copy);
+	}
+
+	public Bitmap getBitmapFromHistoryStack() {
+		Bitmap bitmap = bitmapHistory.pop();
+		if(bitmap != null) {
+			mBitmap = bitmap;
+		}
+
+		return bitmap;
+	}
 }

@@ -37,6 +37,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.catrobat.paintroid.datastructures.Session;
 import org.catrobat.paintroid.intro.TapTargetBottomBar;
 import org.catrobat.paintroid.intro.IntroPageViewAdapter;
 import org.catrobat.paintroid.intro.TapTargetStyle;
