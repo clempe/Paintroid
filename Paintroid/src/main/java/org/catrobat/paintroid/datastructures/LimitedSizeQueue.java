@@ -1,37 +1,51 @@
 package org.catrobat.paintroid.datastructures;
 
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
-public class LimitedSizeQueue<K> extends ArrayList<K> {
+public class LimitedSizeQueue<E>  {
 
     private int maxSize;
+    private LinkedList<E> linkedList = new LinkedList<>();
 
-    public LimitedSizeQueue(int size){
+    public LimitedSizeQueue(int size)
+    {
+        if (size <= 0) {
+            throw new IllegalArgumentException("The size must be greater than 0");
+        }
+
         this.maxSize = size;
     }
 
-    public boolean add(K k){
-        boolean r = super.add(k);
+    public boolean add(E e){
+        boolean r = linkedList.add(e);
         if (size() > maxSize){
-            removeRange(0, size() - maxSize - 1);
+            linkedList.pollFirst();
         }
         return r;
     }
 
-    public K getYongest() {
-        return get(size() - 1);
+    public E getYoungest() {
+        return linkedList.getLast();
     }
 
-    public K getOldest() {
-        return get(0);
+    public E getOldest() {
+        return linkedList.getFirst();
     }
 
-    public K pop() {
-        if (size() > 0) {
-            return remove(size() -1);
-        } else {
-            return null;
-        }
+    public E pop() {
+        return linkedList.pollLast();
+    }
+
+    public int size() {
+        return linkedList.size();
+    }
+
+    public boolean isFull(){
+        return size() == maxSize;
+    }
+
+    public boolean isEmpty(){
+        return size() == 0;
     }
 }

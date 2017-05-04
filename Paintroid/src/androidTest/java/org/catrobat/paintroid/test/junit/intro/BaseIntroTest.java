@@ -6,11 +6,10 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.robotium.solo.Solo;
 
-import org.catrobat.paintroid.Session;
 import org.catrobat.paintroid.WelcomeActivity;
 
-import static org.catrobat.paintroid.Session.IS_FIRST_TIME_LAUNCH;
-import static org.catrobat.paintroid.Session.PREF_NAME;
+import static org.catrobat.paintroid.datastructures.Session.IS_FIRST_TIME_LAUNCH;
+import static org.catrobat.paintroid.datastructures.Session.PREF_NAME;
 
 /**
  * Created by Clemens on 08.11.2016.
