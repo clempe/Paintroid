@@ -47,7 +47,7 @@ public class LayersAdapter extends BaseAdapter implements OnLayerEventListener {
 	private Context mContext;
 	private ArrayList<Layer> mLayerList;
 	private int mLayerCounter = 0;
-	private int mMaxLayer = 4;
+	private int mMaxLayer = PaintroidApplication.maxLayers;
 
 	public LayersAdapter(Context context, boolean fromCatrobat, Bitmap first_layer) {
 		this.mContext = context;

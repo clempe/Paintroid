@@ -31,6 +31,11 @@ public class LimitedSizeQueueTest {
     }
 
     @Test
+    public void testMaxSize() {
+        assertEquals(limit, queue.maxSize());
+    }
+
+    @Test
     public void testSizeOverLimit() {
         for (int i = 0; i < limit*2; i++) {
             queue.add(i);

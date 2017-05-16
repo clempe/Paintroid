@@ -27,6 +27,7 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.command.UndoRedoManager;
+import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.listener.LayerListener;
@@ -44,13 +45,13 @@ public class RedoTool extends BaseTool {
 
 	public RedoTool(Context context, ToolType toolType) {
 		super(context, toolType);
-		mReadyForRedo = true;
 		mPreviousTool = PaintroidApplication.currentTool;
-		mLayer = LayerListener.getInstance().getCurrentLayer();
-		LayerCommand layerCommand = new LayerCommand(mLayer);
+		LayerCommand layerCommand = CommandManagerImplementation.getInstance().redoLastLayerCommand();
+		mLayer = layerCommand.getLayer();
 		mLayerBitmapCommand = PaintroidApplication.commandManager
 				.getLayerBitmapCommand(layerCommand);
 		showProgressDialog();
+		mReadyForRedo = true;
 
 	}
 
@@ -85,9 +86,15 @@ public class RedoTool extends BaseTool {
 				float surfaceTranslationY = PaintroidApplication.perspective.getSurfaceTranslationY();
 
 				Command command = mLayerBitmapCommand.addCommandToRedoList();
+				Layer currentLayer = LayerListener.getInstance().getCurrentLayer();
+				PaintroidApplication.drawingSurface.setBitmap(mLayer.getImage());
+
 				UndoRedoManager.getInstance().update();
 				if(command != null)
 					command.run(PaintroidApplication.drawingSurface.getCanvas(), mLayer.getImage());
+
+				PaintroidApplication.drawingSurface.setBitmap(currentLayer.getImage());
+
 				IndeterminateProgressDialog.getInstance().dismiss();
 				setPerspective(scale, surfaceTranslationX, surfaceTranslationY);
 			}

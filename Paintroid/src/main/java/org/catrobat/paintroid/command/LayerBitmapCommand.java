@@ -8,6 +8,7 @@ import java.util.List;
  * Describes layer commands responsible for drawing. These commands are performed on layer's bitmap.
  */
 public interface LayerBitmapCommand {
+
 	/**
 	 * Retrieves layer assigned to command manager.
 	 *
@@ -69,4 +70,5 @@ public interface LayerBitmapCommand {
 	 */
 	boolean moreCommands();
 
+	int getDrawingState();
 }

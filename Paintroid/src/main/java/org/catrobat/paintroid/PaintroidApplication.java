@@ -68,13 +68,17 @@ public class PaintroidApplication extends Application {
     public static ArrayList<LayerBitmapCommand> drawBitmapCommandsAtLayer;
     public static String defaultSystemLanguage;
     public static SharedPreferences languageSharedPreferences;
+    public static LinkedList<LayerCommand> layersCommandHistory;
+    public static LinkedList<LayerCommand> layersCommandUndo;
+    public static int layerHistorySize = 2;
+    public static int maxLayers = 4;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
         applicationContext = getApplicationContext();
-        commandManager = new CommandManagerImplementation();
+        commandManager = CommandManagerImplementation.getInstance();
         defaultSystemLanguage = Locale.getDefault().getLanguage();
         // open the App in the last chosen language
         languageSharedPreferences = getSharedPreferences("For_language", getApplicationContext().MODE_PRIVATE);

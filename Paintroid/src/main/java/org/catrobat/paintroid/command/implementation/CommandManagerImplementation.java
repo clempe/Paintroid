@@ -19,9 +19,9 @@
 
 package org.catrobat.paintroid.command.implementation;
 
+import android.util.Log;
 import android.util.Pair;
 
-import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.CommandManager;
@@ -38,8 +38,20 @@ import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Observer;
 
+import static org.catrobat.paintroid.PaintroidApplication.TAG;
+import static org.catrobat.paintroid.PaintroidApplication.layersCommandHistory;
+import static org.catrobat.paintroid.PaintroidApplication.layersCommandUndo;
+
 public class CommandManagerImplementation implements CommandManager, Observer {
 	private static final int INIT_APP_lAYER_COUNT = 1;
+	private static CommandManagerImplementation mInstance;
+
+	public static CommandManagerImplementation getInstance() {
+		if (mInstance == null) {
+			mInstance = new CommandManagerImplementation();
+		}
+		return mInstance;
+	}
 
 	public enum CommandType {COMMIT_LAYER_BITMAP_COMMAND
 		,ADD_LAYER
@@ -54,6 +66,8 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 
 	private LinkedList<Pair<CommandType, LayerCommand>> mLayerOperationsCommandList;
 	private LinkedList<Pair<CommandType, LayerCommand>> mLayerOperationsUndoCommandList;
+	public LinkedList<LayerCommand> mLayersCommandHistory;
+	public LinkedList<LayerCommand> mLayersCommandUndo;
 	private ArrayList<LayerBitmapCommand> mDrawBitmapCommandsAtLayer;
 	private boolean initialized;
 
@@ -62,17 +76,24 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 	private ArrayList<OnActiveLayerChangedListener> mChangeActiveLayerListener;
 	private OnLayerEventListener mOnLayerEventListener;
 
+
+
 	public CommandManagerImplementation()
 	{
 		if(PaintroidApplication.layerOperationsCommandList != null){
 			mLayerOperationsCommandList = PaintroidApplication.layerOperationsCommandList;
 			mLayerOperationsUndoCommandList = PaintroidApplication.layerOperationsUndoCommandList;
 			mDrawBitmapCommandsAtLayer = PaintroidApplication.drawBitmapCommandsAtLayer;
+			mLayersCommandHistory = PaintroidApplication.layersCommandHistory;
+			mLayersCommandUndo = PaintroidApplication.layersCommandUndo;
 		}
 		else {
 			mLayerOperationsCommandList = new LinkedList<Pair<CommandType, LayerCommand>>();
 			mLayerOperationsUndoCommandList = new LinkedList<Pair<CommandType, LayerCommand>>();
 			mDrawBitmapCommandsAtLayer = new ArrayList<LayerBitmapCommand>();
+			mLayersCommandHistory = new LinkedList<>();
+			mLayersCommandUndo = new LinkedList<>();
+
 		}
 		initialized = false;
 	}
@@ -107,12 +128,20 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 		synchronized (mLayerOperationsCommandList) {
 			clearUndoCommandList();
 			enableUndo(true);
+			Log.d(TAG, "commit Command");
+
 
 			ArrayList<LayerBitmapCommand> result = getLayerBitmapCommands(layerCommand.getLayer().getLayerID());
 			result.get(0).commitCommandToLayer(bitmapCommand);
 			layerCommand.setLayersBitmapCommands(result);
 
 			mLayerOperationsCommandList.addLast(createLayerCommand(CommandType.COMMIT_LAYER_BITMAP_COMMAND, layerCommand));
+			mLayersCommandHistory.addLast(layerCommand);
+
+/*			Log.d(TAG, "mLayerOperationsCommandList Size " + mLayerOperationsCommandList.size());
+			Log.d(TAG, "mDrawBitmapCommandsAtLayer Size " + mDrawBitmapCommandsAtLayer.size());
+			Log.d(TAG, "mLayerOperationsUndoCommandList Size " + mLayerOperationsUndoCommandList.size());
+			Log.d(TAG, "mChangeActiveLayerListener Size " + mChangeActiveLayerListener.size());*/
 		}
 
 		drawingSurfaceRedraw();
@@ -128,6 +157,7 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 			result.get(0).addCommandToList(command);
 			layerCommand.setLayersBitmapCommands(result);
 			mLayerOperationsCommandList.addLast(createLayerCommand(CommandType.COMMIT_LAYER_BITMAP_COMMAND, layerCommand));
+			mLayersCommandHistory.addLast(layerCommand);
 			layerDialogRefreshView();
 		}
 	}
@@ -279,9 +309,13 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 
 	@Override
 	public void undo() {
+		Log.d(TAG, " ----- CM Undo ------");
 		synchronized (mLayerOperationsCommandList) {
+
+
+			Pair<CommandType, LayerCommand> command = null;
 			if (mLayerOperationsCommandList.size() > INIT_APP_lAYER_COUNT) {
-				Pair<CommandType, LayerCommand> command = mLayerOperationsCommandList.removeLast();
+				command = mLayerOperationsCommandList.removeLast();
 				mLayerOperationsUndoCommandList.addFirst(command);
 				processCommand(command, Action.UNDO);
 				enableRedo(true);
@@ -290,8 +324,29 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 					onFirstCommandReached();
 				}
 			}
+
+	/*		Log.d(TAG, "mLayerOperationsCommandList Size " + mLayerOperationsCommandList.size());
+			Log.d(TAG, "mDrawBitmapCommandsAtLayer Size " + mDrawBitmapCommandsAtLayer.size());
+			Log.d(TAG, "mLayerOperationsUndoCommandList Size " + mLayerOperationsUndoCommandList.size());
+			Log.d(TAG, "mChangeActiveLayerListener Size " + mChangeActiveLayerListener.size());*/
+
 		}
 	}
+
+
+	public LayerCommand undoLastLayerCommand() {
+		if(!mLayersCommandHistory.isEmpty()){
+			LayerCommand lastCommand = mLayersCommandHistory.removeLast();
+			mLayersCommandUndo.addFirst(lastCommand);
+			lastCommand.getLayersBitmapCommands().get(0).undo();
+			enableRedo(true);
+
+
+			return lastCommand;
+		}
+		return null;
+	}
+
 
 	private void onFirstCommandReached() {
 		changeActiveLayer(mLayerOperationsCommandList.get(0).second.getLayer());
@@ -301,6 +356,7 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 	@Override
 	public void redo() {
 		synchronized (mLayerOperationsUndoCommandList) {
+			Log.d(TAG, "CM Redo");
 			if (mLayerOperationsUndoCommandList.size() != 0) {
 				enableUndo(true);
 				Pair<CommandType, LayerCommand> command = mLayerOperationsUndoCommandList.removeFirst();
@@ -313,10 +369,26 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 		}
 	}
 
+
+	public LayerCommand redoLastLayerCommand() {
+		if(!mLayersCommandHistory.isEmpty()){
+			LayerCommand lastCommand = mLayersCommandUndo.removeFirst();
+			mLayersCommandUndo.addFirst(lastCommand);
+
+			if(mLayerOperationsUndoCommandList.size() == 0) {
+				enableRedo(false);
+			}
+
+			return lastCommand;
+		}
+		return null;
+	}
+
 	private void clearUndoCommandList() {
 		synchronized (mLayerOperationsCommandList) {
 			enableRedo(false);
 			mLayerOperationsUndoCommandList.clear();
+			mLayersCommandUndo.clear();
 		}
 	}
 
@@ -354,6 +426,8 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 			case RENAME_LAYER:
 				handleLayerRename(command.second);
 				break;
+			default:
+				break;
 		}
 	}
 
@@ -385,13 +459,13 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 
 	private void handleUndoCommitLayerBitmapCommand(LayerCommand command) {
 		command.getLayersBitmapCommands().get(0).undo();
-		changeActiveLayer(command.getLayer());
+		//changeActiveLayer(command.getLayer());
 		drawingSurfaceRedraw();
 	}
 
 	private void handleRedoCommitLayerBitmapCommand(LayerCommand command) {
 		command.getLayersBitmapCommands().get(0).redo();
-		changeActiveLayer(command.getLayer());
+		//changeActiveLayer(command.getLayer());
 		drawingSurfaceRedraw();
 	}
 
@@ -600,5 +674,7 @@ public class CommandManagerImplementation implements CommandManager, Observer {
 		PaintroidApplication.layerOperationsCommandList = mLayerOperationsCommandList;
 		PaintroidApplication.layerOperationsUndoCommandList = mLayerOperationsUndoCommandList;
 		PaintroidApplication.drawBitmapCommandsAtLayer = mDrawBitmapCommandsAtLayer;
+		PaintroidApplication.layersCommandHistory = mLayersCommandHistory;
+		PaintroidApplication.layersCommandUndo = mLayersCommandUndo;
 	}
 }

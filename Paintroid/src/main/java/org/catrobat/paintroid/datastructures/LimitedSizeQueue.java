@@ -17,12 +17,12 @@ public class LimitedSizeQueue<E>  {
         this.maxSize = size;
     }
 
-    public boolean add(E e){
-        boolean r = linkedList.add(e);
+    public E add(E e){
+        linkedList.add(e);
         if (size() > maxSize){
-            linkedList.pollFirst();
+            return linkedList.pollFirst();
         }
-        return r;
+        return null;
     }
 
     public E getYoungest() {
@@ -48,4 +48,6 @@ public class LimitedSizeQueue<E>  {
     public boolean isEmpty(){
         return size() == 0;
     }
+
+    public int maxSize() {return maxSize;}
 }
