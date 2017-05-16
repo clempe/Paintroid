@@ -16,7 +16,9 @@ public class Layer {
 	private boolean mIsLocked;
 	private boolean mIsVisible;
 	private int mOpacity;
-	private LimitedSizeQueue<Bitmap> bitmapHistory = new LimitedSizeQueue<>(5);
+	private int mDrawCount = 0;
+	private LimitedSizeQueue<Bitmap> bitmapHistory =
+			new LimitedSizeQueue<>(PaintroidApplication.layerHistorySize);
 
 	public Layer(int layer_id, Bitmap image) {
 		mLayerID = layer_id;
@@ -82,6 +84,10 @@ public class Layer {
 		return mBitmap;
 	}
 
+    public Bitmap getImageCopy() {
+        return mBitmap.copy(mBitmap.getConfig(), true);
+    }
+
 	public void setImage(Bitmap image) {
 		mBitmap = image;
 
@@ -92,16 +98,22 @@ public class Layer {
 	}
 
 	public void saveLayerBitmap() {
+		mDrawCount++;
 		Bitmap copy = mBitmap.copy(mBitmap.getConfig(), true);
 		bitmapHistory.add(copy);
 	}
 
 	public Bitmap getBitmapFromHistoryStack() {
+		mDrawCount--;
 		Bitmap bitmap = bitmapHistory.pop();
 		if(bitmap != null) {
 			mBitmap = bitmap;
 		}
 
 		return bitmap;
+	}
+
+	public int getDrawCount() {
+		return mDrawCount;
 	}
 }

@@ -328,7 +328,7 @@ public final class LayerListener implements OnRefreshLayerDialogListener, OnActi
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         selectLayer(mLayersAdapter.getLayer(position));
-        UndoRedoManager.getInstance().update();
+        //UndoRedoManager.getInstance().update();
         //refreshView();
     }
 }

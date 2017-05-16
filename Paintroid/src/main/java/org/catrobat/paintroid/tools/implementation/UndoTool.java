@@ -26,6 +26,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.drawable.PaintDrawable;
 import android.util.Log;
+import android.util.Pair;
 import android.view.SurfaceHolder;
 
 import org.catrobat.paintroid.PaintroidApplication;
@@ -33,8 +34,11 @@ import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.command.UndoRedoManager;
 import org.catrobat.paintroid.command.implementation.BitmapCommand;
+import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
+import org.catrobat.paintroid.command.implementation.LayerBitmapCommandImpl;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.ResizeCommand;
+import org.catrobat.paintroid.datastructures.HistoryBitmap;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Layer;
@@ -42,23 +46,24 @@ import org.catrobat.paintroid.tools.Tool;
 import org.catrobat.paintroid.tools.ToolType;
 
 import java.util.LinkedList;
+import java.util.List;
 
 
 public class UndoTool extends BaseTool {
 
     private Tool mPreviousTool;
     private Layer mLayer;
-    private LayerBitmapCommand mLayerBitmapCommand;
+    private LayerBitmapCommandImpl mLayerBitmapCommand;
     private LinkedList<Command> mCommandList;
     private boolean mReadyForUndo = false;
 
     public UndoTool(Context context, ToolType toolType) {
         super(context, toolType);
         mPreviousTool = PaintroidApplication.currentTool;
-        mLayer = LayerListener.getInstance().getCurrentLayer();
-        LayerCommand layerCommand = new LayerCommand(mLayer);
-        mLayerBitmapCommand = PaintroidApplication.commandManager
-                .getLayerBitmapCommand(layerCommand);
+        LayerCommand layerCommand = CommandManagerImplementation.getInstance().undoLastLayerCommand();
+        mLayerBitmapCommand = (LayerBitmapCommandImpl) PaintroidApplication.commandManager.getLayerBitmapCommand(layerCommand);
+        mLayer = layerCommand.getLayer();
+
         showProgressDialog();
         mReadyForUndo = true;
     }
@@ -99,18 +104,43 @@ public class UndoTool extends BaseTool {
             mLayerBitmapCommand.addCommandToUndoList();
             UndoRedoManager.getInstance().update();
 
-            Bitmap bitmapFromHistoryStack = mLayer.getBitmapFromHistoryStack();
+            Layer currentLayer = LayerListener.getInstance().getCurrentLayer();
+            HistoryBitmap bitmapFromHistoryStack = UndoRedoManager.getInstance().getImage(mLayer);
+
+            int state = mLayerBitmapCommand.getDrawingState();
+            List<Command> layerCommands = mLayerBitmapCommand.getLayerCommands();
+
+
+
 
             if (bitmapFromHistoryStack != null) {
-                PaintroidApplication.drawingSurface.setBitmap(bitmapFromHistoryStack);
+                mLayer.setImage(bitmapFromHistoryStack.getBitmap());
+                int historyCount = bitmapFromHistoryStack.getHistoryCount();
+                if (historyCount != state) {
+
+                    for (int i = historyCount; i < layerCommands.size(); i++) {
+                        Command command = layerCommands.get(i);
+                        command.run(PaintroidApplication.drawingSurface.getCanvas(), mLayer.getImage());
+                    }
+
+                    PaintroidApplication.drawingSurface.setBitmap(mLayer.getImage());
+                }
+
             } else {
 
-                for (Command command : mLayerBitmapCommand.getLayerCommands()) {
-                    if (command.getClass().equals(ResizeCommand.class)) // doesnt work correct -> remove for release
+
+                for (Command command : layerCommands) {
+                    if (command instanceof ResizeCommand) // doesnt work correct -> remove for release
+                    {
                         continue;
+                    }
                     command.run(PaintroidApplication.drawingSurface.getCanvas(), mLayer.getImage());
                 }
+
+                mLayer.setImage(PaintroidApplication.drawingSurface.getBitmapCopy());
             }
+
+            PaintroidApplication.drawingSurface.setBitmap(currentLayer.getImage());
             IndeterminateProgressDialog.getInstance().dismiss();
             setPerspective(scale, surfaceTranslationX, surfaceTranslationY);
         }
