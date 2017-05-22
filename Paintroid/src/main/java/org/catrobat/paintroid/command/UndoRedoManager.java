@@ -42,13 +42,11 @@ public final class UndoRedoManager {
     private TopBar mTopBar;
     private boolean enableUndo = false;
     private boolean enableRedo = false;
-    private SparseArray<LimitedSizeQueue<HistoryBitmap>> historyQueue;
-    private SparseArray<LimitedSizeQueue<HistoryBitmap>> savedBitmaps;
+    private SparseArray<LimitedSizeQueue<HistoryBitmap>> historyQueue = new SparseArray<>();
+    private SparseArray<LimitedSizeQueue<HistoryBitmap>> savedBitmaps = new SparseArray<>();
 
     private UndoRedoManager() {
-        Log.d(TAG, "UndoManager construct");
-        historyQueue = new SparseArray<>();
-        savedBitmaps = new SparseArray<>();
+
     }
 
     public static UndoRedoManager getInstance() {
@@ -177,7 +175,7 @@ public final class UndoRedoManager {
         LimitedSizeQueue<HistoryBitmap> ret = queue.get(id);
         if(ret == null){
             ret = createBitmapQueue();
-            queue.put(id, createBitmapQueue());
+            queue.put(id, ret);
         }
         Log.e(TAG, queue.toString());
         return ret;
@@ -203,7 +201,4 @@ public final class UndoRedoManager {
         return null;
     }
 
-    public SparseArray<LimitedSizeQueue<HistoryBitmap>> getHistoryQueue() {
-        return historyQueue;
-    }
 }
