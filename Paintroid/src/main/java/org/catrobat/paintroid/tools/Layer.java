@@ -17,8 +17,6 @@ public class Layer {
 	private boolean mIsVisible;
 	private int mOpacity;
 	private int mDrawCount = 0;
-	private LimitedSizeQueue<Bitmap> bitmapHistory =
-			new LimitedSizeQueue<>(PaintroidApplication.layerHistorySize);
 
 	public Layer(int layer_id, Bitmap image) {
 		mLayerID = layer_id;
@@ -99,18 +97,6 @@ public class Layer {
 
 	public void saveLayerBitmap() {
 		mDrawCount++;
-		Bitmap copy = mBitmap.copy(mBitmap.getConfig(), true);
-		bitmapHistory.add(copy);
-	}
-
-	public Bitmap getBitmapFromHistoryStack() {
-		mDrawCount--;
-		Bitmap bitmap = bitmapHistory.pop();
-		if(bitmap != null) {
-			mBitmap = bitmap;
-		}
-
-		return bitmap;
 	}
 
 	public int getDrawCount() {

@@ -70,7 +70,8 @@ public class PaintroidApplication extends Application {
     public static SharedPreferences languageSharedPreferences;
     public static LinkedList<LayerCommand> layersCommandHistory;
     public static LinkedList<LayerCommand> layersCommandUndo;
-    public static int layerHistorySize = 2;
+    public static int numUndoSaves = 2;
+    public static int numUndoToolSaves = 3;
     public static int maxLayers = 4;
 
 
@@ -78,7 +79,7 @@ public class PaintroidApplication extends Application {
     public void onCreate() {
         super.onCreate();
         applicationContext = getApplicationContext();
-        commandManager = CommandManagerImplementation.getInstance();
+        commandManager = new CommandManagerImplementation();
         defaultSystemLanguage = Locale.getDefault().getLanguage();
         // open the App in the last chosen language
         languageSharedPreferences = getSharedPreferences("For_language", getApplicationContext().MODE_PRIVATE);

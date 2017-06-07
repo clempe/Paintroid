@@ -99,4 +99,9 @@ public interface CommandManager {
 
 	void enableRedo(boolean enable);
 
+    boolean isUndoCommandListEmpty();
+
+	boolean isRedoCommandListEmpty();
+
+	LayerCommand undoLastLayerCommand();
 }

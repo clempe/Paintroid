@@ -10,7 +10,6 @@ import android.util.SparseArray;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.UndoRedoManager;
-import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
 import org.catrobat.paintroid.command.implementation.FillCommand;
 import org.catrobat.paintroid.command.implementation.PointCommand;
 import org.catrobat.paintroid.datastructures.HistoryBitmap;
@@ -40,6 +39,7 @@ public class UndoToolTest {
     private SparseArray<LimitedSizeQueue<HistoryBitmap>> savedBitmaps;
     private UndoRedoManager undoRedoManager;
     private int layerHistorySize;
+    private int toolHistorySize;
     private static int[] colors = new int[]{
             Color.GREEN,
             Color.BLACK,
@@ -63,7 +63,8 @@ public class UndoToolTest {
 
     @Before
     public void setUp() throws Exception {
-        layerHistorySize = PaintroidApplication.layerHistorySize = 3;
+        layerHistorySize = PaintroidApplication.numUndoSaves = 3;
+        toolHistorySize = PaintroidApplication.numUndoToolSaves = 3;
         numberLayers = 3;
         undoRedoManager = UndoRedoManager.getInstance();
         bitmaps = new ArrayList<>(colors.length);
@@ -77,7 +78,7 @@ public class UndoToolTest {
         for (int i = 0; i < numberLayers; i++) {
             layers.add(new Layer(i, bitmaps.get(0).copy(Bitmap.Config.ARGB_8888, true)));
         }
-        historyQueue = (SparseArray<LimitedSizeQueue<HistoryBitmap>>) PrivateAccess.getMemberValue(UndoRedoManager.class, undoRedoManager, "historyQueue");
+        historyQueue = (SparseArray<LimitedSizeQueue<HistoryBitmap>>) PrivateAccess.getMemberValue(UndoRedoManager.class, undoRedoManager, "undoArray");
         savedBitmaps = (SparseArray<LimitedSizeQueue<HistoryBitmap>>) PrivateAccess.getMemberValue(UndoRedoManager.class, undoRedoManager, "savedBitmaps");
 
     }
@@ -106,7 +107,6 @@ public class UndoToolTest {
 
     @Test
     public void checkHistoryBitmap() {
-
         addBitmapsToUndoManager(layerHistorySize, CommandType.PointCommand);
         checkSizeForAllLayers(layerHistorySize, historyQueue);
         checkSavedBitmaps(layerHistorySize);
@@ -114,16 +114,15 @@ public class UndoToolTest {
 
     @Test
     public void checkSavedBitmapForSpecificCommand() {
-
         addBitmapsToUndoManager(layerHistorySize, CommandType.FillCommand);
         addBitmapsToUndoManager(layerHistorySize * 2, CommandType.PointCommand);
 
         checkSizeForAllLayers(layerHistorySize, historyQueue);
-        checkSizeForAllLayers(layerHistorySize, savedBitmaps);
+        checkSizeForAllLayers(toolHistorySize, savedBitmaps);
 
         checkSavedBitmaps(layerHistorySize);
         checkSizeForAllLayers(0, historyQueue);
-        checkSizeForAllLayers(layerHistorySize, savedBitmaps);
+        checkSizeForAllLayers(toolHistorySize, savedBitmaps);
 
         //Simulate Click on Undo
         for (int i = 0; i < numberLayers; i++) {
@@ -193,7 +192,7 @@ public class UndoToolTest {
             for (int i = 0; i < amount; i++) {
                 addBitmapUndoManager(layer, commandType);
                 int size = historyQueue.get(id).size();
-                int expected = Math.min(PaintroidApplication.layerHistorySize, alreadyAdded[id]);
+                int expected = Math.min(PaintroidApplication.numUndoSaves, alreadyAdded[id]);
                 assertEquals(expected, size);
             }
         }
@@ -205,5 +204,7 @@ public class UndoToolTest {
             assertEquals(expectedSize, size);
         }
     }
+
+
 
 }

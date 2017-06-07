@@ -19,12 +19,11 @@
 
 package org.catrobat.paintroid.command;
 
-import android.os.Debug;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.SparseArray;
 
 import org.catrobat.paintroid.PaintroidApplication;
-import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
 import org.catrobat.paintroid.command.implementation.FillCommand;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.StampCommand;
@@ -35,6 +34,7 @@ import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.TopBar;
 
 import static org.catrobat.paintroid.PaintroidApplication.TAG;
+import static org.catrobat.paintroid.PaintroidApplication.numUndoToolSaves;
 
 public final class UndoRedoManager {
 
@@ -42,7 +42,7 @@ public final class UndoRedoManager {
     private TopBar mTopBar;
     private boolean enableUndo = false;
     private boolean enableRedo = false;
-    private SparseArray<LimitedSizeQueue<HistoryBitmap>> historyQueue = new SparseArray<>();
+    private SparseArray<LimitedSizeQueue<HistoryBitmap>> undoArray = new SparseArray<>();
     private SparseArray<LimitedSizeQueue<HistoryBitmap>> savedBitmaps = new SparseArray<>();
 
     private UndoRedoManager() {
@@ -72,51 +72,51 @@ public final class UndoRedoManager {
         handleRedo(layerBitmapCommand);
     }
 
-    private void handleUndo(LayerBitmapCommand layerBitmapCommand) {
-        if (!CommandManagerImplementation.getInstance().mLayersCommandHistory.isEmpty())
-            PaintroidApplication.commandManager.enableUndo(true);
-        else
-            PaintroidApplication.commandManager.enableUndo(false);
-
-        if (!CommandManagerImplementation.getInstance().mLayersCommandUndo.isEmpty())
-            PaintroidApplication.commandManager.enableRedo(true);
-        else
-            PaintroidApplication.commandManager.enableRedo(false);
-    }
-
-    private void handleRedo(LayerBitmapCommand layerBitmapCommand) {
-        if (!CommandManagerImplementation.getInstance().mLayersCommandHistory.isEmpty())
-            PaintroidApplication.commandManager.enableUndo(true);
-        else
-            PaintroidApplication.commandManager.enableUndo(false);
-
-        if (!CommandManagerImplementation.getInstance().mLayersCommandUndo.isEmpty())
-            PaintroidApplication.commandManager.enableRedo(true);
-        else
-            PaintroidApplication.commandManager.enableRedo(false);
-    }
+//    private void handleUndo(LayerBitmapCommand layerBitmapCommand) {
+//        if (!CommandManagerImplementation.getInstance().mLayersCommandHistory.isEmpty())
+//            PaintroidApplication.commandManager.enableUndo(true);
+//        else
+//            PaintroidApplication.commandManager.enableUndo(false);
 //
-//	private void handleUndo(LayerBitmapCommand layerBitmapCommand) {
-//		if(layerBitmapCommand.getLayerCommands().size() != 0)
-//			PaintroidApplication.commandManager.enableUndo(true);
-//		else
-//			PaintroidApplication.commandManager.enableUndo(false);
-//		if(layerBitmapCommand.getLayerUndoCommands().size() != 0)
-//			PaintroidApplication.commandManager.enableRedo(true);
-//		else
-//			PaintroidApplication.commandManager.enableRedo(false);
-//	}
+//        if (!CommandManagerImplementation.getInstance().mLayersCommandUndo.isEmpty())
+//            PaintroidApplication.commandManager.enableRedo(true);
+//        else
+//            PaintroidApplication.commandManager.enableRedo(false);
+//    }
 //
-//	private void handleRedo(LayerBitmapCommand layerBitmapCommand) {
-//		if(layerBitmapCommand.getLayerCommands().size() != 0)
-//			PaintroidApplication.commandManager.enableUndo(true);
-//		else
-//			PaintroidApplication.commandManager.enableUndo(false);
-//		if(layerBitmapCommand.getLayerUndoCommands().size() != 0)
-//			PaintroidApplication.commandManager.enableRedo(true);
-//		else
-//			PaintroidApplication.commandManager.enableRedo(false);
-//	}
+//    private void handleRedo(LayerBitmapCommand layerBitmapCommand) {
+//        if (!CommandManagerImplementation.getInstance().mLayersCommandHistory.isEmpty())
+//            PaintroidApplication.commandManager.enableUndo(true);
+//        else
+//            PaintroidApplication.commandManager.enableUndo(false);
+//
+//        if (!CommandManagerImplementation.getInstance().mLayersCommandUndo.isEmpty())
+//            PaintroidApplication.commandManager.enableRedo(true);
+//        else
+//            PaintroidApplication.commandManager.enableRedo(false);
+//    }
+//
+	private void handleUndo(LayerBitmapCommand layerBitmapCommand) {
+		if(layerBitmapCommand.getLayerCommands().size() != 0)
+			PaintroidApplication.commandManager.enableUndo(true);
+		else
+			PaintroidApplication.commandManager.enableUndo(false);
+		if(layerBitmapCommand.getLayerUndoCommands().size() != 0)
+			PaintroidApplication.commandManager.enableRedo(true);
+		else
+			PaintroidApplication.commandManager.enableRedo(false);
+	}
+
+	private void handleRedo(LayerBitmapCommand layerBitmapCommand) {
+		if(layerBitmapCommand.getLayerCommands().size() != 0)
+			PaintroidApplication.commandManager.enableUndo(true);
+		else
+			PaintroidApplication.commandManager.enableUndo(false);
+		if(layerBitmapCommand.getLayerUndoCommands().size() != 0)
+			PaintroidApplication.commandManager.enableRedo(true);
+		else
+			PaintroidApplication.commandManager.enableRedo(false);
+	}
 //
 //	public void update(StatusMode status) {
 //		switch (status) {
@@ -143,15 +143,13 @@ public final class UndoRedoManager {
 //		}
 //	}
 
-    private LimitedSizeQueue<HistoryBitmap> createBitmapQueue() {
-        return new LimitedSizeQueue<>(PaintroidApplication.layerHistorySize);
+    private LimitedSizeQueue<HistoryBitmap> createBitmapQueue(int max) {
+        return new LimitedSizeQueue<>(max);
     }
 
-    public void saveImage(Layer layer, int drawingState, Command command) {
-        int id = layer.getLayerID();
-
-        LimitedSizeQueue<HistoryBitmap> queue = getQueue(historyQueue, id);
-        HistoryBitmap historyBitmap = new HistoryBitmap(layer.getImageCopy(), drawingState, command);
+    public void saveImage(int id, Bitmap image,int drawingState, Command command) {
+        LimitedSizeQueue<HistoryBitmap> queue = getQueue(undoArray, id, PaintroidApplication.numUndoSaves);
+        HistoryBitmap historyBitmap = new HistoryBitmap(image, drawingState, command);
 
         HistoryBitmap removed = queue.add(historyBitmap);
         Log.e(TAG, queue.toString());
@@ -162,19 +160,24 @@ public final class UndoRedoManager {
 
         if (removed != null &&
                 (removed.getCommand() instanceof StampCommand ||
-                 removed.getCommand() instanceof FillCommand)) {
+                        removed.getCommand() instanceof FillCommand)) {
             Log.e(TAG, "Keep Bitmap Stored  because of Command Type Layer: " + id);
-            queue = getQueue(savedBitmaps, id);
+            queue = getQueue(savedBitmaps, id, numUndoToolSaves);
             queue.add(removed);
         }
 
-        Log.e(TAG, historyQueue.get(0).toString());
+        Log.e(TAG, undoArray.get(0).toString());
     }
 
-    private LimitedSizeQueue<HistoryBitmap> getQueue(SparseArray<LimitedSizeQueue<HistoryBitmap>> queue, int id) {
+    public void saveImage(Layer layer, int drawingState, Command command) {
+        int id = layer.getLayerID();
+        saveImage(id, layer.getImageCopy(), drawingState, command);
+    }
+
+    private LimitedSizeQueue<HistoryBitmap> getQueue(SparseArray<LimitedSizeQueue<HistoryBitmap>> queue, int id, int max) {
         LimitedSizeQueue<HistoryBitmap> ret = queue.get(id);
         if(ret == null){
-            ret = createBitmapQueue();
+            ret = createBitmapQueue(max);
             queue.put(id, ret);
         }
         Log.e(TAG, queue.toString());
@@ -183,7 +186,7 @@ public final class UndoRedoManager {
 
     public HistoryBitmap getImage(Layer layer) {
         int id = layer.getLayerID();
-        LimitedSizeQueue<HistoryBitmap> queue = historyQueue.get(id);
+        LimitedSizeQueue<HistoryBitmap> queue = undoArray.get(id);
         if (queue != null && !queue.isEmpty()) {
             Log.d(TAG, "Get Bitmap from History queue, Layer: " + id);
             return queue.pop();

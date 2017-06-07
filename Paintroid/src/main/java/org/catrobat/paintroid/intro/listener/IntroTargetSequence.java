@@ -8,10 +8,6 @@ import com.getkeepsafe.taptargetview.TapTargetSequence;
 
 import static org.catrobat.paintroid.intro.helper.IntroAnimation.fadeIn;
 
-/**
- * Created by Clemens on 16.03.2017.
- */
-
 public class IntroTargetSequence implements TapTargetSequence.Listener {
 
 
@@ -29,7 +25,7 @@ public class IntroTargetSequence implements TapTargetSequence.Listener {
     }
 
     @Override
-    public void onSequenceStep(TapTarget lastTarget) {
+    public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
 
     }
 

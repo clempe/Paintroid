@@ -46,10 +46,9 @@ public class RedoTool extends BaseTool {
 	public RedoTool(Context context, ToolType toolType) {
 		super(context, toolType);
 		mPreviousTool = PaintroidApplication.currentTool;
-		LayerCommand layerCommand = CommandManagerImplementation.getInstance().redoLastLayerCommand();
+		LayerCommand layerCommand = PaintroidApplication.commandManager.undoLastLayerCommand();
 		mLayer = layerCommand.getLayer();
-		mLayerBitmapCommand = PaintroidApplication.commandManager
-				.getLayerBitmapCommand(layerCommand);
+		mLayerBitmapCommand = PaintroidApplication.commandManager.getLayerBitmapCommand(layerCommand);
 		showProgressDialog();
 		mReadyForRedo = true;
 
