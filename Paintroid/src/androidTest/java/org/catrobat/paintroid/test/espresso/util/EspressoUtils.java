@@ -21,17 +21,28 @@ package org.catrobat.paintroid.test.espresso.util;
 
 import android.app.Activity;
 import android.content.Context;
+<<<<<<< HEAD
 import android.graphics.Bitmap;
+=======
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+>>>>>>> Added Testing Strucutur
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.DrawerActions;
+<<<<<<< HEAD
+=======
+import android.view.Gravity;
+>>>>>>> Added Testing Strucutur
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
+<<<<<<< HEAD
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.dialog.colorpicker.PresetSelectorView;
@@ -39,6 +50,20 @@ import org.catrobat.paintroid.intro.TapTargetTopBar;
 import org.catrobat.paintroid.listener.BrushPickerView;
 import org.catrobat.paintroid.test.utils.PrivateAccess;
 import org.catrobat.paintroid.test.utils.Utils;
+=======
+import com.robotium.solo.SystemUtils;
+
+import org.catrobat.paintroid.PaintroidApplication;
+import org.catrobat.paintroid.R;
+import org.catrobat.paintroid.command.implementation.ResizeCommand;
+import org.catrobat.paintroid.dialog.colorpicker.PresetSelectorView;
+import org.catrobat.paintroid.intro.TapTargetTopBar;
+import org.catrobat.paintroid.listener.BrushPickerView;
+import org.catrobat.paintroid.listener.LayerListener;
+import org.catrobat.paintroid.test.utils.PrivateAccess;
+import org.catrobat.paintroid.test.utils.Utils;
+import org.catrobat.paintroid.tools.Layer;
+>>>>>>> Added Testing Strucutur
 import org.catrobat.paintroid.tools.ToolType;
 import org.catrobat.paintroid.tools.implementation.BaseTool;
 import org.catrobat.paintroid.tools.implementation.BaseToolWithShape;
@@ -46,6 +71,12 @@ import org.catrobat.paintroid.tools.implementation.FillTool;
 import org.catrobat.paintroid.ui.DrawingSurface;
 import org.catrobat.paintroid.ui.Perspective;
 
+<<<<<<< HEAD
+=======
+import java.util.ArrayList;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+>>>>>>> Added Testing Strucutur
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
@@ -60,9 +91,18 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.catrobat.paintroid.Multilingual.setContextLocale;
 import static org.catrobat.paintroid.test.espresso.util.UiInteractions.selectViewPagerPage;
+<<<<<<< HEAD
 import static org.catrobat.paintroid.test.espresso.util.UiMatcher.hasTablePosition;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
+=======
+import static org.catrobat.paintroid.test.espresso.util.UiInteractions.swipe;
+import static org.catrobat.paintroid.test.espresso.util.UiInteractions.touchAt;
+import static org.catrobat.paintroid.test.espresso.util.UiMatcher.hasTablePosition;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
+>>>>>>> Added Testing Strucutur
 import static org.junit.Assert.fail;
 
 /**
@@ -144,6 +184,17 @@ public final class EspressoUtils {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.close());
     }
 
+<<<<<<< HEAD
+=======
+    public static void openLayerDrawer() {
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open(Gravity.END|Gravity.CENTER));
+    }
+
+    public static void closeLayerDrawer() {
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.close(Gravity.END|Gravity.CENTER));
+    }
+
+>>>>>>> Added Testing Strucutur
     public static float getActionbarHeight() {
         return Utils.getActionbarHeight();
     }
@@ -343,4 +394,36 @@ public final class EspressoUtils {
             setContextLocale(context, "");
         }
     }
+<<<<<<< HEAD
+=======
+
+    public static void drawHorizontalLine(int xStart, int xEnd, int y) throws NoSuchFieldException, IllegalAccessException {
+        selectTool(ToolType.LINE);
+        PointF pointOnSurfaceStart = convertFromCanvasToScreen(new PointF(xStart, y), PaintroidApplication.perspective);
+        PointF pointOnSurfaceEnd = convertFromCanvasToScreen(new PointF(xEnd, y), PaintroidApplication.perspective);
+        onView(isRoot()).perform(swipe(pointOnSurfaceStart, pointOnSurfaceEnd));
+    }
+
+    public static Layer getLayer(int id){
+        ArrayList<Layer> layers = LayerListener.getInstance().getAdapter().getLayers();
+
+        for (Layer layer : layers) {
+            if(layer.getLayerID() == id) {
+                return layer;
+            }
+        }
+
+        throw new ArrayIndexOutOfBoundsException();
+    }
+
+    public static Layer getCurrentLayer() {
+        return LayerListener.getInstance().getCurrentLayer();
+    }
+
+    public static void addLayer() {
+        openLayerDrawer();
+        onView(withId(R.id.layer_side_nav_button_add)).perform(click());
+        closeLayerDrawer();
+    }
+>>>>>>> Added Testing Strucutur
 }
