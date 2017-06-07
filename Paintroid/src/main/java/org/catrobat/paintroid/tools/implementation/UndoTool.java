@@ -60,7 +60,7 @@ public class UndoTool extends BaseTool {
     public UndoTool(Context context, ToolType toolType) {
         super(context, toolType);
         mPreviousTool = PaintroidApplication.currentTool;
-        LayerCommand layerCommand = CommandManagerImplementation.getInstance().undoLastLayerCommand();
+        LayerCommand layerCommand = PaintroidApplication.commandManager.undoLastLayerCommand();
         mLayerBitmapCommand = (LayerBitmapCommandImpl) PaintroidApplication.commandManager.getLayerBitmapCommand(layerCommand);
         mLayer = layerCommand.getLayer();
 

@@ -21,6 +21,7 @@ package org.catrobat.paintroid.tools.implementation;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -39,6 +40,7 @@ import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
+import org.catrobat.paintroid.command.UndoRedoManager;
 import org.catrobat.paintroid.command.implementation.FillCommand;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
@@ -120,9 +122,13 @@ public class FillTool extends BaseTool {
 		if(mReadyForDrawing) {
 			mReadyForDrawing = false;
 			Layer layer = LayerListener.getInstance().getCurrentLayer();
-			layer.saveLayerBitmap();
+			Bitmap imageCopy = layer.getImageCopy();
+
 			mCommand.run(PaintroidApplication.drawingSurface.getCanvas(), layer.getImage());
 			LayerCommand layerCommand = new LayerCommand(LayerListener.getInstance().getCurrentLayer());
+			int drawingState = PaintroidApplication.commandManager.getLayerBitmapCommand(layerCommand).getDrawingState();
+			UndoRedoManager.getInstance().saveImage(layer.getLayerID(), imageCopy, drawingState, mCommand);
+
 			PaintroidApplication.commandManager.addCommandToList(layerCommand,mCommand);
 		}
 	}

@@ -26,6 +26,7 @@ import org.catrobat.paintroid.ui.Perspective;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -53,24 +54,17 @@ public class Utils {
 
 	public static synchronized Point convertFromCanvasToScreen(Point canvasPoint, Perspective currentPerspective)
 			throws SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException {
-		Float surfaceCenterX = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective,
-				"mSurfaceCenterX");
-		Float surfaceScale = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective,
-				"mSurfaceScale");
-		Float surfaceTranslationX = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective,
-				"mSurfaceTranslationX");
-		Float surfaceCenterY = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective,
-				"mSurfaceCenterY");
-		Float surfaceTranslationY = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective,
-				"mSurfaceTranslationY");
-
-		Float mInitialTranslationY = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective,
-				"mInitialTranslationY");
+		Float surfaceCenterX = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective, "mSurfaceCenterX");
+		Float surfaceScale = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective, "mSurfaceScale");
+		Float surfaceTranslationX = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective, "mSurfaceTranslationX");
+		Float surfaceCenterY = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective, "mSurfaceCenterY");
+		Float surfaceTranslationY = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective, "mSurfaceTranslationY");
+		Float mInitialTranslationY = (Float) PrivateAccess.getMemberValue(Perspective.class, currentPerspective, "mInitialTranslationY");
 
 		Point screenPoint = new Point();
 		screenPoint.x = (int) ((canvasPoint.x + surfaceTranslationX - surfaceCenterX) * surfaceScale + surfaceCenterX);
 		screenPoint.y = (int) ((canvasPoint.y + surfaceTranslationY - surfaceCenterY) * surfaceScale + surfaceCenterY + Math
-				.abs(mInitialTranslationY));
+				.abs(mInitialTranslationY)) + getStatusBarHeight() / 2;
 
 		return screenPoint;
 	}
@@ -109,5 +103,14 @@ public class Utils {
 	public static PointF getCanvasPointFromScreenPoint(PointF screenPoint) {
 		return PaintroidApplication.perspective
 				.getCanvasPointFromSurfacePoint(getSurfacePointFromScreenPoint(screenPoint));
+	}
+
+	public static int getStatusBarHeight() {
+		int result = 0;
+		int resourceId = Resources.getSystem().getIdentifier("status_bar_height", "dimen", "android");
+		if (resourceId > 0) {
+			result = Resources.getSystem().getDimensionPixelSize(resourceId);
+		}
+		return result;
 	}
 }
