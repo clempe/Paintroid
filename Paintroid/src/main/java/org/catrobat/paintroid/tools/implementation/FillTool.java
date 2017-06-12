@@ -42,8 +42,7 @@ import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
-
-import java.util.Locale;
+import org.catrobat.paintroid.tools.helper.FillAlgorithm;
 
 public class FillTool extends BaseTool {
 	public static final int DEFAULT_TOLERANCE_IN_PERCENT = 12;
@@ -195,7 +194,7 @@ public class FillTool extends BaseTool {
 	}
 
 	private void updateColorToleranceText(int toleranceInPercent) {
-		mColorToleranceEditText.setText(String.format(Locale.getDefault(),"%d",toleranceInPercent));
+		mColorToleranceEditText.setText(String.valueOf(toleranceInPercent));
 		mColorToleranceEditText.setSelection(mColorToleranceEditText.length());
 	}
 }

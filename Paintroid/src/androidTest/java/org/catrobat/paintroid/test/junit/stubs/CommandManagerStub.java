@@ -120,5 +120,20 @@ public class CommandManagerStub extends BaseStub implements CommandManager {
 		return null;
 	}
 
+	@Override
+	public boolean isUndoCommandListEmpty() {
+		return false;
+	}
+
+	@Override
+	public boolean isRedoCommandListEmpty() {
+		return false;
+	}
+
+	@Override
+	public LayerCommand undoLastLayerCommand() {
+		return null;
+	}
+
 
 }

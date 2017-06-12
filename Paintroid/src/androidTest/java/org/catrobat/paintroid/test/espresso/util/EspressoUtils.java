@@ -1,3 +1,4 @@
+
 /**
  * Paintroid: An image manipulation application for Android.
  * Copyright (C) 2010-2015 The Catrobat Team
