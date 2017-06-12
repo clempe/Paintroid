@@ -30,6 +30,7 @@ public final class IndeterminateProgressDialog extends BaseDialog {
 	private static final String NOT_INITIALIZED_ERROR_MESSAGE = "IndeterminateProgressDialog has not been initialized. Call init() first!";
 
 	private static IndeterminateProgressDialog instance;
+	public static final String TAG = "Dialog";
 
 	private IndeterminateProgressDialog(Context context) {
 		super(context);

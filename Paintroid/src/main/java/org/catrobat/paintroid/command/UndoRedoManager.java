@@ -26,12 +26,13 @@ import android.util.SparseArray;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.implementation.FillCommand;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
-import org.catrobat.paintroid.command.implementation.StampCommand;
 import org.catrobat.paintroid.datastructures.HistoryBitmap;
 import org.catrobat.paintroid.datastructures.LimitedSizeQueue;
 import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.ui.TopBar;
+
+import java.util.Arrays;
 
 import static org.catrobat.paintroid.PaintroidApplication.TAG;
 import static org.catrobat.paintroid.PaintroidApplication.numUndoToolSaves;
@@ -44,8 +45,13 @@ public final class UndoRedoManager {
     private boolean enableRedo = false;
     private SparseArray<LimitedSizeQueue<HistoryBitmap>> undoArray = new SparseArray<>();
     private SparseArray<LimitedSizeQueue<HistoryBitmap>> savedBitmaps = new SparseArray<>();
+    private Class<?>[] commandToStore;
+    private int nThCommand = 20;
 
     private UndoRedoManager() {
+        commandToStore = new Class<?>[] {
+                FillCommand.class
+        };
 
     }
 
@@ -158,9 +164,9 @@ public final class UndoRedoManager {
                 + queue.size() + "/" + queue.maxSize());
 
 
-        if (removed != null &&
-                (removed.getCommand() instanceof StampCommand ||
-                        removed.getCommand() instanceof FillCommand)) {
+        if (removed != null && (
+                Arrays.asList(commandToStore).contains(removed.getCommand().getClass())
+                || removed.getHistoryCount() % nThCommand == 0)) {
             Log.e(TAG, "Keep Bitmap Stored  because of Command Type Layer: " + id);
             queue = getQueue(savedBitmaps, id, numUndoToolSaves);
             queue.add(removed);

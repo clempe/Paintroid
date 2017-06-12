@@ -70,5 +70,5 @@ public interface LayerBitmapCommand {
 	 */
 	boolean moreCommands();
 
-	int getDrawingState();
+	int getDrawingCount();
 }

@@ -19,24 +19,19 @@
 
 package org.catrobat.paintroid.tools.implementation;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.os.AsyncTask;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
-import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.Command;
@@ -44,11 +39,9 @@ import org.catrobat.paintroid.command.UndoRedoManager;
 import org.catrobat.paintroid.command.implementation.FillCommand;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
-import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.ToolType;
-import org.catrobat.paintroid.tools.helper.FillAlgorithm;
 
 import java.util.Locale;
 
@@ -126,7 +119,7 @@ public class FillTool extends BaseTool {
 
 			mCommand.run(PaintroidApplication.drawingSurface.getCanvas(), layer.getImage());
 			LayerCommand layerCommand = new LayerCommand(LayerListener.getInstance().getCurrentLayer());
-			int drawingState = PaintroidApplication.commandManager.getLayerBitmapCommand(layerCommand).getDrawingState();
+			int drawingState = PaintroidApplication.commandManager.getLayerBitmapCommand(layerCommand).getDrawingCount();
 			UndoRedoManager.getInstance().saveImage(layer.getLayerID(), imageCopy, drawingState, mCommand);
 
 			PaintroidApplication.commandManager.addCommandToList(layerCommand,mCommand);

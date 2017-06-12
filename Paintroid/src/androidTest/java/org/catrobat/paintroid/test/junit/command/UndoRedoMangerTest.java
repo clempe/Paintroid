@@ -1,3 +1,22 @@
+/**
+ * Paintroid: An image manipulation application for Android.
+ * Copyright (C) 2010-2015 The Catrobat Team
+ * (<http://developer.catrobat.org/credits>)
+ * <p>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.catrobat.paintroid.test.junit.command;
 
 import android.graphics.Bitmap;
@@ -28,7 +47,7 @@ import java.util.ArrayList;
 import static junit.framework.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
-public class UndoToolTest {
+public class UndoRedoMangerTest {
 
     private static int numberLayers;
     private int[] drawCounter;
@@ -80,7 +99,8 @@ public class UndoToolTest {
         }
         historyQueue = (SparseArray<LimitedSizeQueue<HistoryBitmap>>) PrivateAccess.getMemberValue(UndoRedoManager.class, undoRedoManager, "undoArray");
         savedBitmaps = (SparseArray<LimitedSizeQueue<HistoryBitmap>>) PrivateAccess.getMemberValue(UndoRedoManager.class, undoRedoManager, "savedBitmaps");
-
+        PrivateAccess.setMemberValue(UndoRedoManager.class, undoRedoManager, "nThCommand", 100);
+        PrivateAccess.setMemberValue(UndoRedoManager.class, undoRedoManager, "commandToStore", new Class<?>[] {FillCommand.class});
     }
 
     @After
@@ -90,6 +110,7 @@ public class UndoToolTest {
         undoRedoManager = null;
         PrivateAccess.setMemberValue(UndoRedoManager.class, UndoRedoManager.getInstance(),
                 "mInstance", null);
+
         System.gc();
     }
 
@@ -134,6 +155,14 @@ public class UndoToolTest {
 
     }
 
+    @Test
+    public void checkNthCommand() throws NoSuchFieldException, IllegalAccessException {
+        int nth = 3;
+        PrivateAccess.setMemberValue(UndoRedoManager.class, undoRedoManager, "nThCommand", nth);
+        addBitmapsToUndoManager(nth*layerHistorySize+1, CommandType.PointCommand);
+        assertEquals(toolHistorySize, savedBitmaps.get(0).size());
+    }
+
     private static Bitmap createBitmap(int color) {
         Bitmap bitmap = Bitmap.createBitmap(80, 80, Bitmap.Config.ARGB_8888);
         bitmap.eraseColor(color);
@@ -147,13 +176,13 @@ public class UndoToolTest {
         return command;
     }
 
+
     private Command createFillCommand() {
         Paint paint = new Paint();
         Point point = new Point();
         Command command = new FillCommand(point, paint, 12);
         return command;
     }
-
 
     private Command getCommand(CommandType commandType) {
         switch (commandType) {
@@ -204,7 +233,5 @@ public class UndoToolTest {
             assertEquals(expectedSize, size);
         }
     }
-
-
 
 }

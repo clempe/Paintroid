@@ -8,19 +8,13 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
-import org.catrobat.paintroid.MainActivity;
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
 import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.command.UndoRedoManager;
-import org.catrobat.paintroid.dialog.LayersDialog;
 import org.catrobat.paintroid.listener.LayerListener;
 import org.catrobat.paintroid.tools.Layer;
 import org.catrobat.paintroid.tools.Tool;
-import org.catrobat.paintroid.tools.ToolFactory;
-import org.catrobat.paintroid.tools.ToolType;
-import org.catrobat.paintroid.tools.implementation.FillTool;
-import org.catrobat.paintroid.tools.implementation.UndoTool;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +27,7 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
 
     public LinkedList<Command> mCommandList;
     public LinkedList<Command> mUndoCommandList;
-    private int drawingState = 0;
+    private int drawingCount = 0;
 
 
     public LayerBitmapCommandImpl(LayerCommand layerCommand) {
@@ -54,13 +48,13 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
             mUndoCommandList.clear();
 
             if (mCommandList.peekLast() != null)
-                UndoRedoManager.getInstance().saveImage(mLayer, drawingState, mCommandList.getLast());
+                UndoRedoManager.getInstance().saveImage(mLayer, drawingCount, mCommandList.getLast());
 
 
             mCommandList.addLast(command);
             mLayer.saveLayerBitmap();
 
-            drawingState++;
+            drawingCount++;
 
             command.run(PaintroidApplication.drawingSurface.getCanvas(), mLayer.getImage());
             PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
@@ -71,7 +65,7 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
     public void addCommandToList(Command command) {
         mUndoCommandList.clear();
         mCommandList.addLast(command);
-        drawingState++;
+        drawingCount++;
         PaintroidApplication.currentTool.resetInternalState(Tool.StateChange.RESET_INTERNAL_STATE);
     }
 
@@ -97,7 +91,7 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
     public synchronized void undo() {
         synchronized (mCommandList) {
             //TODO Can this be removed?
-            drawingState--;
+            drawingCount--;
         }
     }
 
@@ -114,7 +108,7 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
     public synchronized void redo() {
         synchronized (mUndoCommandList) {
             if (mUndoCommandList.size() != 0) {
-                drawingState++;
+                drawingCount++;
                 Command command = mUndoCommandList.removeFirst();
                 mCommandList.addLast(command);
                 command.run(PaintroidApplication.drawingSurface.getCanvas(), mLayer.getImage());
@@ -188,7 +182,7 @@ public class LayerBitmapCommandImpl implements LayerBitmapCommand {
     }
 
     @Override
-    public int getDrawingState() {
-        return drawingState;
+    public int getDrawingCount() {
+        return drawingCount;
     }
 }
