@@ -34,19 +34,19 @@ import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.test.utils.PrivateAccess;
 import org.catrobat.paintroid.test.utils.SystemAnimations;
 
-public class UndoRedoTestRule<T extends Activity> extends ActivityTestRule<T> {
+public class UndoTestRule<T extends Activity> extends ActivityTestRule<T> {
     private SystemAnimations systemAnimations;
     private DrawerLayout drawerLayout;
 
-    public UndoRedoTestRule(Class<T> activityClass) {
+    public UndoTestRule(Class<T> activityClass) {
         super(activityClass);
     }
 
-    public UndoRedoTestRule(Class<T> activityClass, boolean initialTouchMode) {
+    public UndoTestRule(Class<T> activityClass, boolean initialTouchMode) {
         super(activityClass, initialTouchMode);
     }
 
-    public UndoRedoTestRule(Class<T> activityClass, boolean initialTouchMode, boolean launchActivity) {
+    public UndoTestRule(Class<T> activityClass, boolean initialTouchMode, boolean launchActivity) {
         super(activityClass, initialTouchMode, launchActivity);
     }
 

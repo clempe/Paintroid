@@ -20,21 +20,13 @@
 package org.catrobat.paintroid.tools.implementation;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.drawable.PaintDrawable;
 import android.util.Log;
-import android.util.Pair;
-import android.view.SurfaceHolder;
 
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.command.Command;
-import org.catrobat.paintroid.command.LayerBitmapCommand;
 import org.catrobat.paintroid.command.UndoRedoManager;
-import org.catrobat.paintroid.command.implementation.BitmapCommand;
-import org.catrobat.paintroid.command.implementation.CommandManagerImplementation;
 import org.catrobat.paintroid.command.implementation.LayerBitmapCommandImpl;
 import org.catrobat.paintroid.command.implementation.LayerCommand;
 import org.catrobat.paintroid.command.implementation.ResizeCommand;
@@ -107,7 +99,7 @@ public class UndoTool extends BaseTool {
             Layer currentLayer = LayerListener.getInstance().getCurrentLayer();
             HistoryBitmap bitmapFromHistoryStack = UndoRedoManager.getInstance().getImage(mLayer);
 
-            int state = mLayerBitmapCommand.getDrawingState();
+            int state = mLayerBitmapCommand.getDrawingCount();
             List<Command> layerCommands = mLayerBitmapCommand.getLayerCommands();
 
 

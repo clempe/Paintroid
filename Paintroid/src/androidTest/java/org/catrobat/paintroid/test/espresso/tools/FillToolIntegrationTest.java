@@ -108,7 +108,6 @@ public class FillToolIntegrationTest {
 	public void setUp() throws NoSuchFieldException, IllegalAccessException {
 		dialogWait = new DialogHiddenIdlingResource(IndeterminateProgressDialog.getInstance());
 		Espresso.registerIdlingResources(dialogWait);
-
 		activityHelper = new ActivityHelper(launchActivityRule.getActivity());
 
 		PaintroidApplication.drawingSurface.destroyDrawingCache();

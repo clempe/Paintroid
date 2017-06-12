@@ -22,6 +22,9 @@ package org.catrobat.paintroid.test.espresso.util;
 
 import android.app.Dialog;
 import android.support.test.espresso.IdlingResource;
+import android.support.v4.app.FragmentManager;
+
+import org.catrobat.paintroid.dialog.IndeterminateProgressDialog;
 
 /**
  * Waits until {@link Dialog#isShowing()} is false.
@@ -30,9 +33,15 @@ public class DialogHiddenIdlingResource implements IdlingResource {
 
     private Dialog dialog;
     private ResourceCallback resourceCallback;
+    private FragmentManager manager;
 
     public DialogHiddenIdlingResource(Dialog dialog) {
         this.dialog = dialog;
+    }
+
+    public DialogHiddenIdlingResource(Dialog dialog, FragmentManager manager) {
+        this.dialog = dialog;
+        this.manager = manager;
     }
 
     @Override
@@ -42,7 +51,8 @@ public class DialogHiddenIdlingResource implements IdlingResource {
 
     @Override
     public boolean isIdleNow() {
-        boolean isIdle = !dialog.isShowing();
+//        boolean isIdle = !dialog.isShowing();;
+        boolean isIdle = (manager.findFragmentByTag(IndeterminateProgressDialog.TAG) == null);
 
         if (isIdle) {
             resourceCallback.onTransitionToIdle();

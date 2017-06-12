@@ -37,6 +37,8 @@ import android.widget.TableRow;
 
 import com.robotium.solo.SystemUtils;
 
+import junit.framework.Assert;
+
 import org.catrobat.paintroid.PaintroidApplication;
 import org.catrobat.paintroid.R;
 import org.catrobat.paintroid.command.implementation.ResizeCommand;
@@ -57,6 +59,7 @@ import org.catrobat.paintroid.ui.Perspective;
 import java.util.ArrayList;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
@@ -75,6 +78,7 @@ import static org.catrobat.paintroid.test.espresso.util.UiInteractions.swipe;
 import static org.catrobat.paintroid.test.espresso.util.UiInteractions.touchAt;
 import static org.catrobat.paintroid.test.espresso.util.UiMatcher.hasTablePosition;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -202,15 +206,17 @@ public final class EspressoUtils {
     }
 
     public static void selectTool(ToolType toolType) {
-        ViewInteraction toolInteraction = onView(withId(toolType.getToolButtonID()))
-            .perform(scrollTo());
-
         if(PaintroidApplication.currentTool.getToolType() != toolType) {
-            toolInteraction.perform(click());
+            ViewInteraction toolInteraction = onView(withId(toolType.getToolButtonID()))
+                    .perform(scrollTo(), click());
+
+        }
+        if(PaintroidApplication.currentTool.getToolType() != toolType) {
+//            toolInteraction.perform(click());
         }
 
         // Some test fail without wait
-        waitMillis(500);
+//        waitMillis(500);
     }
 
     public static void longClickOnTool(ToolType toolType) {
@@ -392,6 +398,20 @@ public final class EspressoUtils {
     public static void addLayer() {
         openLayerDrawer();
         onView(withId(R.id.layer_side_nav_button_add)).perform(click());
+        closeLayerDrawer();
+    }
+
+    public static void addLayers(int amount) {
+        openLayerDrawer();
+        for (int i = 0; i < amount; i++) {
+            onView(withId(R.id.layer_side_nav_button_add)).perform(click());
+        }
+        closeLayerDrawer();
+    }
+
+    public static void selectLayerAtPosition(int position) {
+        openLayerDrawer();
+        onData(anything()).inAdapterView(withId(R.id.nav_layer_list)).atPosition(position).perform(click());
         closeLayerDrawer();
     }
 }
